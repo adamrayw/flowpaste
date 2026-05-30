@@ -7,10 +7,58 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  title: {
+    default: 'FlowPaste',
+    template: '%s | FlowPaste',
+  },
+  description:
+    'FlowPaste is a modern code-sharing workspace with syntax highlighting, privacy controls, collections, and AI-powered developer tools.',
+  keywords: [
+    'code sharing',
+    'pastebin alternative',
+    'developer tools',
+    'syntax highlighting',
+    'OpenRouter',
+    'AI code assistant',
+  ],
+  applicationName: 'FlowPaste',
+  authors: [{ name: 'Raytech Cloud' }],
+  creator: 'Raytech Cloud',
+  publisher: 'Raytech Cloud',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'FlowPaste',
+    description:
+      'Share code smarter with syntax highlighting, privacy controls, analytics, and AI tools.',
+    url: '/',
+    siteName: 'FlowPaste',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og',
+        width: 1200,
+        height: 630,
+        alt: 'FlowPaste',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'FlowPaste',
+    description:
+      'Share code smarter with syntax highlighting, privacy controls, analytics, and AI tools.',
+    images: ['/og'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
+    shortcut: '/icon-light-32x32.png',
     icon: [
       {
         url: '/icon-light-32x32.png',
@@ -22,6 +70,10 @@ export const metadata: Metadata = {
       },
       {
         url: '/icon.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/favicon.svg',
         type: 'image/svg+xml',
       },
     ],

@@ -2,7 +2,17 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Code2, Zap, Share2, Lock, Sparkles, ArrowRight } from 'lucide-react'
+import { Code2, Zap, Share2, Lock, Sparkles, ArrowRight, ChevronDown, LayoutDashboard, Settings, LogOut } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { signOut } from 'next-auth/react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const features = [
   {
@@ -38,6 +48,48 @@ const features = [
 ]
 
 export default function Home() {
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    const loadSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', { cache: 'no-store' })
+        if (!response.ok) {
+          return
+        }
+
+        const data = (await response.json()) as { user: { name: string; email: string } }
+        if (!active) return
+        setUser(data.user)
+      } finally {
+        if (active) {
+          setIsCheckingSession(false)
+        }
+      }
+    }
+
+    void loadSession()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true)
+    try {
+      await signOut({ redirect: false })
+      setUser(null)
+    } finally {
+      setIsSigningOut(false)
+      window.location.href = '/'
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -49,14 +101,57 @@ export default function Home() {
             </div>
             <span className="font-bold text-lg">FlowPaste</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/auth/sign-in">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
-            <Link href="/auth/sign-up">
-              <Button>Get Started</Button>
-            </Link>
-          </div>
+          {!isCheckingSession && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <span className="hidden sm:inline max-w-[150px] truncate">{user.name}</span>
+                  <span className="sm:hidden">Profile</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuLabel className="space-y-0.5">
+                  <p className="font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground font-normal">{user.email}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/app/dashboard" className="flex items-center gap-2">
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/app/settings" className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(event) => {
+                    event.preventDefault()
+                    void handleSignOut()
+                  }}
+                  className="text-destructive focus:text-destructive"
+                  disabled={isSigningOut}
+                >
+                  <LogOut className="w-4 h-4" />
+                  {isSigningOut ? 'Signing out...' : 'Sign Out'}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link href="/auth/sign-in">
+                <Button variant="ghost" className="hidden sm:inline-flex">Sign In</Button>
+              </Link>
+              <Link href="/auth/sign-up">
+                <Button size="sm" className="sm:h-10 sm:px-4">Get Started</Button>
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -158,14 +253,18 @@ const result = fibonacci(10);`}</code>
       {/* Footer */}
       <footer className="border-t border-border py-8 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-accent rounded-lg flex items-center justify-center">
                 <Code2 className="w-3 h-3 text-accent-foreground" />
               </div>
               <span className="font-semibold">FlowPaste</span>
             </div>
-            <p className="text-muted-foreground text-sm">© 2024 FlowPaste. All rights reserved.</p>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <p>© 2026 FlowPaste. All rights reserved.</p>
+            </div>
           </div>
         </div>
       </footer>

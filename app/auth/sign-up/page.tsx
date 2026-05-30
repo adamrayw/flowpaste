@@ -4,9 +4,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { Code2, ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 export default function SignUp() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +17,36 @@ export default function SignUp() {
     confirmPassword: ''
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [checkingSession, setCheckingSession] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', { cache: 'no-store' })
+        if (response.ok) {
+          router.replace('/app/dashboard')
+          return
+        }
+      } finally {
+        if (active) {
+          setCheckingSession(false)
+        }
+      }
+    }
+
+    void checkSession()
+
+    return () => {
+      active = false
+    }
+  }, [router])
+
+  if (checkingSession) {
+    return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Checking session...</div>
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -22,12 +55,50 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
     setLoading(true)
-    // Mock signup - in a real app this would call an API
-    setTimeout(() => {
+
+    try {
+      const response = await fetch('/api/auth/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
+
+      const data = (await response.json().catch(() => null)) as { message?: string } | null
+      if (!response.ok) {
+        throw new Error(data?.message ?? 'Failed to create account')
+      }
+
+      const loginResult = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if (!loginResult || loginResult.error) {
+        throw new Error('Account created, but auto sign-in failed. Please sign in manually.')
+      }
+
+      router.push('/app/dashboard')
+      router.refresh()
+    } catch (signUpError) {
+      setError(signUpError instanceof Error ? signUpError.message : 'Failed to create account')
+    } finally {
       setLoading(false)
-      // Would redirect to dashboard or email verification
-    }, 1000)
+    }
   }
 
   return (
@@ -114,6 +185,8 @@ export default function SignUp() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Creating account...' : 'Create Account'}
             </Button>
+
+            {error ? <p className="text-sm text-red-500">{error}</p> : null}
           </form>
 
           {/* Divider */}
@@ -135,7 +208,14 @@ export default function SignUp() {
 
           {/* Footer Text */}
           <p className="text-center text-sm text-muted-foreground">
-            By signing up, you agree to our Terms of Service and Privacy Policy
+            By signing up, you agree to our{' '}
+            <Link href="/terms" className="text-accent hover:underline">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="text-accent hover:underline">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </div>

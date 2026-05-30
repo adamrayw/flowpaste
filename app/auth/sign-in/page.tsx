@@ -4,14 +4,47 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import { Code2, ArrowLeft } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 export default function SignIn() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [checkingSession, setCheckingSession] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', { cache: 'no-store' })
+        if (response.ok) {
+          router.replace('/app/dashboard')
+          return
+        }
+      } finally {
+        if (active) {
+          setCheckingSession(false)
+        }
+      }
+    }
+
+    void checkSession()
+
+    return () => {
+      active = false
+    }
+  }, [router])
+
+  if (checkingSession) {
+    return <div className="min-h-screen bg-background grid place-items-center text-sm text-muted-foreground">Checking session...</div>
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -20,12 +53,27 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     setLoading(true)
-    // Mock signin - in a real app this would call an API
-    setTimeout(() => {
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if (!result || result.error) {
+        throw new Error('Invalid email or password')
+      }
+
+      router.push('/app/dashboard')
+      router.refresh()
+    } catch (signInError) {
+      setError(signInError instanceof Error ? signInError.message : 'Failed to sign in')
+    } finally {
       setLoading(false)
-      // Would redirect to dashboard
-    }, 1000)
+    }
   }
 
   return (
@@ -94,6 +142,8 @@ export default function SignIn() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
+
+            {error ? <p className="text-sm text-red-500">{error}</p> : null}
           </form>
 
           {/* Divider */}
@@ -115,7 +165,14 @@ export default function SignIn() {
 
           {/* Footer Text */}
           <p className="text-center text-sm text-muted-foreground">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+            By signing in, you agree to our{' '}
+            <Link href="/terms" className="text-accent hover:underline">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="text-accent hover:underline">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </div>

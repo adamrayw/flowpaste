@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PasteVisibility {
+  public
+  private
+  unlisted
+}
+
+model Paste {
+  id          String          @id @default(cuid())
+  userId      String
+  title       String
+  content     String
+  language    String
+  description String?
+  visibility  PasteVisibility @default(public)
+  passwordHash String?
+  expiresAt   DateTime?
+  isFavorite  Boolean         @default(false)
+  views       Int             @default(0)
+  shares      Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  collections PasteCollection[]
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([visibility, createdAt])
+  @@index([language, createdAt])
+  @@index([isFavorite, createdAt])
+}
+
+model Collection {
+  id          String            @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pastes      PasteCollection[]
+
+  @@unique([userId, name])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model PasteCollection {
+  pasteId      String
+  collectionId String
+  assignedAt   DateTime   @default(now())
+  paste        Paste      @relation(fields: [pasteId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@id([pasteId, collectionId])
+  @@index([collectionId])
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  bio          String?
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  pastes       Paste[]
+  collections  Collection[]
+}
