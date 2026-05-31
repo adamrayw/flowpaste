@@ -3,6 +3,7 @@ import {
   buildAuthLoginUrl,
   buildAuthRegisterUrl,
   raytechSessionCookieName,
+  resolveProductReturnTo,
 } from "@/lib/raytech-account";
 
 const authRoutes = new Set(["/auth/sign-in", "/auth/sign-up"]);
@@ -13,7 +14,7 @@ export async function proxy(request: NextRequest) {
   const isAuthenticated = Boolean(sessionCookie);
 
   if (pathname.startsWith("/app") && !isAuthenticated) {
-    const loginUrl = new URL(buildAuthLoginUrl(request.url));
+    const loginUrl = new URL(buildAuthLoginUrl(resolveProductReturnTo(request.url)));
     return NextResponse.redirect(loginUrl);
   }
 
@@ -21,14 +22,14 @@ export async function proxy(request: NextRequest) {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/app/dashboard", request.url));
     }
-    return NextResponse.redirect(new URL(buildAuthLoginUrl(request.url)));
+    return NextResponse.redirect(new URL(buildAuthLoginUrl(resolveProductReturnTo(request.url))));
   }
 
   if (pathname === "/auth/sign-up") {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL("/app/dashboard", request.url));
     }
-    return NextResponse.redirect(new URL(buildAuthRegisterUrl(request.url)));
+    return NextResponse.redirect(new URL(buildAuthRegisterUrl(resolveProductReturnTo(request.url))));
   }
 
   if (authRoutes.has(pathname) && isAuthenticated) {

@@ -7,11 +7,16 @@ export type RaytechUser = {
 };
 
 const fallbackAuthBaseUrl = "http://localhost:3000";
+const fallbackAppBaseUrl = "http://localhost:3000";
 
 export const raytechAuthBaseUrl =
   process.env.NEXT_PUBLIC_AUTH_URL ||
   process.env.RAYTECH_AUTH_URL ||
   fallbackAuthBaseUrl;
+
+export const flowpasteAppBaseUrl =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  fallbackAppBaseUrl;
 
 export const raytechSessionCookieName =
   process.env.RAYTECH_SESSION_COOKIE_NAME ||
@@ -28,6 +33,32 @@ function fallbackNameFromEmail(email: string) {
 
 function getAuthUrl(path: string) {
   return new URL(path, raytechAuthBaseUrl).toString();
+}
+
+function isLocalHostname(hostname: string) {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+export function resolveProductReturnTo(rawUrl?: string) {
+  if (!rawUrl) {
+    return undefined;
+  }
+
+  try {
+    const requestUrl = new URL(rawUrl);
+    const appUrl = new URL(flowpasteAppBaseUrl);
+
+    if (isLocalHostname(requestUrl.hostname) && !isLocalHostname(appUrl.hostname)) {
+      return new URL(
+        `${requestUrl.pathname}${requestUrl.search}${requestUrl.hash}`,
+        appUrl,
+      ).toString();
+    }
+
+    return requestUrl.toString();
+  } catch {
+    return rawUrl;
+  }
 }
 
 export function buildAuthLoginUrl(returnTo?: string) {
