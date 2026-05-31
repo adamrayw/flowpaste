@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Code2, Home, Plus, FileText, Heart, Search, BarChart3, Settings, LogOut, Menu, X, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import {
   CommandDialog,
@@ -35,7 +35,6 @@ export default function AppLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [authError, setAuthError] = useState('')
@@ -51,7 +50,6 @@ export default function AppLayout({
 
     const loadMe = async () => {
       try {
-        setIsCheckingAuth(true)
         setAuthError('')
 
         const response = await fetch('/api/auth/me', { cache: 'no-store' })
@@ -84,7 +82,7 @@ export default function AppLayout({
     return () => {
       active = false
     }
-  }, [pathname, router])
+  }, [router])
 
   const handleSignOut = async () => {
     setIsSigningOut(true)
