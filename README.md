@@ -22,6 +22,12 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Authentication
+
+- FlowPaste uses RayTech Account SSO.
+- Sign-in/sign-up are handled by auth service (`NEXT_PUBLIC_AUTH_URL` / `RAYTECH_AUTH_URL`).
+- Product session is validated through `GET /api/auth/me`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 ## Learn More

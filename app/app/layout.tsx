@@ -5,7 +5,7 @@ import { Code2, Home, Plus, FileText, Heart, Search, BarChart3, Settings, LogOut
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import { getAuthSignOutUrl } from '@/lib/raytech-account'
 import {
   CommandDialog,
   CommandEmpty,
@@ -87,7 +87,10 @@ export default function AppLayout({
   const handleSignOut = async () => {
     setIsSigningOut(true)
     try {
-      await signOut({ redirect: false })
+      await fetch(getAuthSignOutUrl(), {
+        method: 'POST',
+        credentials: 'include',
+      })
     } finally {
       router.push('/auth/sign-in')
       router.refresh()

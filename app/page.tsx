@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Code2, Zap, Share2, Lock, Sparkles, ArrowRight, ChevronDown, LayoutDashboard, Settings, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { signOut } from 'next-auth/react'
+import { getAuthSignOutUrl } from '@/lib/raytech-account'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,7 +82,10 @@ export default function Home() {
   const handleSignOut = async () => {
     setIsSigningOut(true)
     try {
-      await signOut({ redirect: false })
+      await fetch(getAuthSignOutUrl(), {
+        method: 'POST',
+        credentials: 'include',
+      })
       setUser(null)
     } finally {
       setIsSigningOut(false)

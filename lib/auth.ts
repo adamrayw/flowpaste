@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth-options";
+import { getAuthorizedRaytechUser } from "@/lib/raytech-account";
 
 type AuthUser = {
   id: string;
@@ -9,18 +8,7 @@ type AuthUser = {
 };
 
 export async function getAuthUserFromRequest(_request: Request): Promise<AuthUser | null> {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
-
-  if (!user?.id || !user.email || !user.name) {
-    return null;
-  }
-
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  };
+  return getAuthorizedRaytechUser(_request);
 }
 
 export function unauthorizedResponse() {
