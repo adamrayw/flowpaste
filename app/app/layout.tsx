@@ -224,6 +224,9 @@ export default function AppLayout({
             <LogOut className="w-4 h-4" />
             <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
           </button>
+          <p className="px-4 pt-2 text-xs text-muted-foreground">
+            A product by <span className="font-medium text-foreground/70">raytech.cloud</span>
+          </p>
         </div>
       </aside>
 

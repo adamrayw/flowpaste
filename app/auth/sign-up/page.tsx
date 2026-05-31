@@ -217,6 +217,10 @@ export default function SignUp() {
               Privacy Policy
             </Link>
           </p>
+
+          <p className="text-center text-xs text-muted-foreground">
+            A product by <span className="font-medium text-foreground/70">raytech.cloud</span>
+          </p>
         </div>
       </div>
     </div>

@@ -169,6 +169,9 @@ export default function Home() {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               FlowPaste is the modern code sharing platform. Create, share, and collaborate on code snippets with syntax highlighting, privacy controls, and AI-powered analysis.
             </p>
+            <p className="text-sm text-muted-foreground">
+              A product by <span className="font-medium text-foreground/70">raytech.cloud</span>
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -258,7 +261,10 @@ const result = fibonacci(10);`}</code>
               <div className="w-6 h-6 bg-accent rounded-lg flex items-center justify-center">
                 <Code2 className="w-3 h-3 text-accent-foreground" />
               </div>
-              <span className="font-semibold">FlowPaste</span>
+              <div className="leading-tight">
+                <span className="block font-semibold">FlowPaste</span>
+                <span className="text-xs text-muted-foreground">A product by raytech.cloud</span>
+              </div>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
