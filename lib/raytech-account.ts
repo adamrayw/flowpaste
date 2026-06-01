@@ -103,6 +103,14 @@ export function getAuthSignOutUrl() {
   return getAuthUrl("/api/auth/sign-out");
 }
 
+export function buildAuthLogoutUrl(returnTo?: string) {
+  const url = new URL(getAuthUrl("/logout"));
+  if (returnTo) {
+    url.searchParams.set("returnTo", returnTo);
+  }
+  return url.toString();
+}
+
 export async function getRaytechUserByCookie(params: {
   cookieHeader?: string | null;
   origin?: string | null;

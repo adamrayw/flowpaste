@@ -5,7 +5,7 @@ import { Code2, Home, Plus, FileText, Heart, Search, BarChart3, Settings, LogOut
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { getAuthSignOutUrl } from '@/lib/raytech-account'
+import { buildAuthLogoutUrl } from '@/lib/raytech-account'
 import {
   CommandDialog,
   CommandEmpty,
@@ -86,20 +86,7 @@ export default function AppLayout({
 
   const handleSignOut = async () => {
     setIsSigningOut(true)
-    try {
-      await fetch(getAuthSignOutUrl(), {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-        },
-        body: JSON.stringify({}),
-      })
-    } finally {
-      router.push('/auth/sign-in')
-      router.refresh()
-    }
+    window.location.href = buildAuthLogoutUrl(`${window.location.origin}/auth/sign-in`)
   }
 
   useEffect(() => {

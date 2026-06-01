@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Code2, Zap, Share2, Lock, Sparkles, ArrowRight, ChevronDown, LayoutDashboard, Settings, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { getAuthSignOutUrl } from '@/lib/raytech-account'
+import { buildAuthLogoutUrl } from '@/lib/raytech-account'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,19 +82,10 @@ export default function Home() {
   const handleSignOut = async () => {
     setIsSigningOut(true)
     try {
-      await fetch(getAuthSignOutUrl(), {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'content-type': 'application/json',
-          accept: 'application/json',
-        },
-        body: JSON.stringify({}),
-      })
       setUser(null)
     } finally {
       setIsSigningOut(false)
-      window.location.href = '/'
+      window.location.href = buildAuthLogoutUrl(`${window.location.origin}/`)
     }
   }
 
