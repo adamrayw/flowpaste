@@ -90,6 +90,11 @@ export default function AppLayout({
       await fetch(getAuthSignOutUrl(), {
         method: 'POST',
         credentials: 'include',
+        headers: {
+          'content-type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({}),
       })
     } finally {
       router.push('/auth/sign-in')
