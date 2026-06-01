@@ -6,22 +6,44 @@ export type RaytechUser = {
   email: string;
 };
 
-const fallbackAuthBaseUrl = "http://localhost:3000";
+function sanitizeEnvValue(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  return trimmed.replace(/^['"]+|['"]+$/g, "");
+}
+
+const fallbackAuthBaseUrl = "http://localhost:3003";
 const fallbackAppBaseUrl = "http://localhost:3000";
 
-export const raytechAuthBaseUrl =
-  process.env.NEXT_PUBLIC_AUTH_URL ||
-  process.env.RAYTECH_AUTH_URL ||
-  fallbackAuthBaseUrl;
+const configuredAuthBaseUrl =
+  sanitizeEnvValue(process.env.RAYTECH_AUTH_URL) ||
+  sanitizeEnvValue(process.env.NEXT_PUBLIC_AUTH_URL);
+
+export const raytechAuthBaseUrl = configuredAuthBaseUrl || fallbackAuthBaseUrl;
 
 export const flowpasteAppBaseUrl =
-  process.env.NEXT_PUBLIC_APP_URL ||
+  sanitizeEnvValue(process.env.NEXT_PUBLIC_APP_URL) ||
   fallbackAppBaseUrl;
 
 export const raytechSessionCookieName =
-  process.env.RAYTECH_SESSION_COOKIE_NAME ||
-  process.env.COOKIE_NAME ||
+  sanitizeEnvValue(process.env.RAYTECH_SESSION_COOKIE_NAME) ||
+  sanitizeEnvValue(process.env.COOKIE_NAME) ||
   "raytech_session";
+
+export const raytechSessionCookieNames = Array.from(
+  new Set(
+    raytechSessionCookieName.startsWith("__Secure-")
+      ? [raytechSessionCookieName, raytechSessionCookieName.replace(/^__Secure-/, "")]
+      : [raytechSessionCookieName, `__Secure-${raytechSessionCookieName}`],
+  ),
+);
 
 const LOCAL_PASSWORD_PLACEHOLDER = "__managed_by_raytech_account__";
 

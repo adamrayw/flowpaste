@@ -1,6 +1,21 @@
+function sanitizeEnvValue(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  return trimmed.replace(/^['"]+|['"]+$/g, "");
+}
+
 const fallbackAuthBaseUrl = "http://localhost:3003";
 
-const raytechAuthBaseUrl = process.env.NEXT_PUBLIC_AUTH_URL || fallbackAuthBaseUrl;
+const raytechAuthBaseUrl =
+  sanitizeEnvValue(process.env.NEXT_PUBLIC_AUTH_URL) ||
+  fallbackAuthBaseUrl;
 
 function getAuthUrl(path: string) {
   return new URL(path, raytechAuthBaseUrl).toString();
