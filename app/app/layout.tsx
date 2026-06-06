@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Code2, Home, Plus, FileText, Heart, Search, BarChart3, Settings, LogOut, Menu, X, Sparkles } from 'lucide-react'
+import { FlowPasteLogo } from '@/components/brand/flowpaste-logo'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
@@ -179,9 +180,7 @@ export default function AppLayout({
         {/* Logo */}
         <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <Code2 className="w-4 h-4 text-accent-foreground" />
-            </div>
+            <FlowPasteLogo className="h-8 w-8" priority />
             <span className="font-bold">FlowPaste</span>
           </Link>
         </div>

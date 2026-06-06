@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Code2 } from 'lucide-react'
+import { FlowPasteLogo } from '@/components/brand/flowpaste-logo'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -22,9 +22,7 @@ export default function PrivacyPage() {
       <header className="border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <Code2 className="w-4 h-4 text-accent-foreground" />
-            </div>
+            <FlowPasteLogo className="h-8 w-8" priority />
             <span className="font-bold">FlowPaste</span>
           </Link>
           <Link href="/auth/sign-up" className="text-sm text-accent hover:underline">

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Code2, Zap, Share2, Lock, Sparkles, ArrowRight, ChevronDown, LayoutDashboard, Settings, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { buildAuthLogoutUrl } from '@/lib/raytech-account'
+import { FlowPasteLogo } from '@/components/brand/flowpaste-logo'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -95,9 +96,7 @@ export default function Home() {
       <nav className="border-b border-border backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <Code2 className="w-4 h-4 text-accent-foreground" />
-            </div>
+            <FlowPasteLogo className="h-8 w-8" priority />
             <span className="font-bold text-lg">FlowPaste</span>
           </div>
           {!isCheckingSession && user ? (
@@ -257,9 +256,7 @@ const result = fibonacci(10);`}</code>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-accent rounded-lg flex items-center justify-center">
-                <Code2 className="w-3 h-3 text-accent-foreground" />
-              </div>
+              <FlowPasteLogo className="h-6 w-6" />
               <div className="leading-tight">
                 <span className="block font-semibold">FlowPaste</span>
                 <span className="text-xs text-muted-foreground">A product by raytech.cloud</span>

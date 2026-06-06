@@ -3,8 +3,9 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import { Code2, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
+import { FlowPasteLogo } from '@/components/brand/flowpaste-logo'
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('')
@@ -38,9 +39,7 @@ export default function ResetPassword() {
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
           <div className="flex items-center gap-2 justify-center">
-            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-              <Code2 className="w-5 h-5 text-accent-foreground" />
-            </div>
+            <FlowPasteLogo className="h-10 w-10" priority />
             <span className="font-bold text-xl">FlowPaste</span>
           </div>
 

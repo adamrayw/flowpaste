@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import { Code2, Copy, Eye, Heart, Share2, Lock } from 'lucide-react'
+import { FlowPasteLogo } from '@/components/brand/flowpaste-logo'
 
 export default function Demo() {
   const demoCode = `// Example: Fibonacci Function
@@ -21,9 +22,7 @@ console.log(result); // 55`
       <nav className="border-b border-border backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <Code2 className="w-4 h-4 text-accent-foreground" />
-            </div>
+            <FlowPasteLogo className="h-8 w-8" priority />
             <span className="font-bold text-lg">FlowPaste</span>
           </Link>
           <div className="flex items-center gap-4">
