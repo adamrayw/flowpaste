@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -42,38 +43,55 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q")?.trim() ?? "";
   const favoriteOnly = searchParams.get("favorite") === "true";
+  const scope = searchParams.get("scope");
+  const isPublicScope = scope === "public";
+  const filters: Prisma.PasteWhereInput[] = [
+    isPublicScope
+      ? {
+          visibility: "public",
+          passwordHash: null,
+        }
+      : {
+          userId: user.id,
+        },
+    {
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    },
+  ];
+
+  if (favoriteOnly && !isPublicScope) {
+    filters.push({ isFavorite: true });
+  }
+
+  if (query) {
+    filters.push({
+      OR: [
+        { title: { contains: query, mode: "insensitive" } },
+        { content: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+      ],
+    });
+  }
 
   const items = await prisma.paste.findMany({
     where: {
-      userId: user.id,
-      ...(favoriteOnly ? { isFavorite: true } : {}),
-      ...(query
-        ? {
-            OR: [
-              { title: { contains: query, mode: "insensitive" } },
-              { content: { contains: query, mode: "insensitive" } },
-              { description: { contains: query, mode: "insensitive" } },
-            ],
-          }
-        : {}),
+      AND: filters,
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
-  const now = Date.now();
-  const visibleItems = items.filter((item) => !item.expiresAt || item.expiresAt.getTime() > now);
-
   return NextResponse.json({
-    pastes: visibleItems.map((item) => ({
+    pastes: items.map((item) => ({
       id: item.id,
       title: item.title,
       content: item.content,
       description: item.description,
       language: item.language,
       visibility: item.visibility,
-      isFavorite: item.isFavorite,
+      isFavorite: item.userId === user.id ? item.isFavorite : false,
+      isOwner: item.userId === user.id,
       hasPassword: Boolean(item.passwordHash),
       views: item.views,
       shares: item.shares,

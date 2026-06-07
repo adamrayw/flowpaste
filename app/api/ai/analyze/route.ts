@@ -110,8 +110,24 @@ export async function POST(request: Request) {
   if (pasteId) {
     const paste = await prisma.paste.findFirst({
       where: {
-        id: pasteId,
-        userId: user.id,
+        AND: [
+          { id: pasteId },
+          {
+            OR: [
+              { userId: user.id },
+              {
+                visibility: { in: ["public", "unlisted"] },
+                passwordHash: null,
+              },
+            ],
+          },
+          {
+            OR: [
+              { expiresAt: null },
+              { expiresAt: { gt: new Date() } },
+            ],
+          },
+        ],
       },
       select: {
         id: true,

@@ -48,6 +48,7 @@ export default function SearchPage() {
         setError('')
 
         const params = new URLSearchParams()
+        params.set('scope', 'public')
         if (query.trim()) {
           params.set('q', query.trim())
         }
@@ -101,13 +102,16 @@ export default function SearchPage() {
     <div className="p-6 space-y-6">
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Search Pastes</h1>
+        <p className="text-sm text-muted-foreground">
+          Browse public pastes from the FlowPaste community.
+        </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search your pastes..."
+              placeholder="Search public pastes..."
               className="pl-10 text-base"
             />
           </div>
@@ -137,7 +141,9 @@ export default function SearchPage() {
               </EmptyMedia>
               <EmptyTitle>No pastes found</EmptyTitle>
               <EmptyDescription>
-                {query.trim() ? `No result for "${query}". Try another keyword.` : 'Create your first paste to start searching.'}
+                {query.trim()
+                  ? `No public result for "${query}". Try another keyword.`
+                  : 'No public pastes are available yet.'}
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>

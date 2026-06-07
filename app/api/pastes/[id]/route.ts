@@ -51,7 +51,10 @@ export async function GET(
   const existing = await prisma.paste.findFirst({
     where: {
       id,
-      userId: user.id,
+      OR: [
+        { userId: user.id },
+        { visibility: { in: ["public", "unlisted"] } },
+      ],
     },
   });
 
@@ -98,10 +101,13 @@ export async function GET(
       createdAt: paste.createdAt,
       updatedAt: paste.updatedAt,
       expiresAt: paste.expiresAt,
-      collections: paste.collections.map((item) => ({
-        id: item.collection.id,
-        name: item.collection.name,
-      })),
+      collections:
+        paste.userId === user.id
+          ? paste.collections.map((item) => ({
+              id: item.collection.id,
+              name: item.collection.name,
+            }))
+          : [],
       hasPassword: Boolean(paste.passwordHash),
     },
   });
